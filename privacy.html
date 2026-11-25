@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Sudoku Grove</title>
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f2f8ec;
+      --surface: #ffffff;
+      --forest: #245843;
+      --ink: #1d2f27;
+      --muted: #55685e;
+      --gold-soft: #fff5d9;
+      --border: rgba(36, 88, 67, 0.14);
+    }
+    [data-theme="dark"] {
+      --bg: #13251d;
+      --surface: #1e362b;
+      --forest: #8fd1a8;
+      --ink: #e8f4ec;
+      --muted: #9eb8aa;
+      --gold-soft: #3a3320;
+      --border: rgba(149, 207, 172, 0.16);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.7;
+    }
+    .container { width: min(820px, calc(100% - 2rem)); margin: 0 auto; }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding: 0.9rem 0;
+      margin-bottom: 2rem;
+    }
+    .nav { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand { display: flex; align-items: center; gap: 0.65rem; text-decoration: none; color: inherit; font-weight: 700; }
+    .brand img { width: 34px; height: 34px; border-radius: 9px; }
+    .back-link { color: var(--forest); text-decoration: none; font-weight: 700; font-size: 0.92rem; }
+    article {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: clamp(1.5rem, 4vw, 2.8rem);
+      margin-bottom: 3rem;
+    }
+    h1, h2 { font-family: 'Fraunces', Georgia, serif; color: var(--forest); }
+    h1 { font-size: clamp(1.8rem, 3.6vw, 2.4rem); margin-bottom: 0.6rem; }
+    h2 { font-size: 1.25rem; margin-top: 1.8rem; margin-bottom: 0.55rem; }
+    p { margin-bottom: 0.9rem; color: var(--ink); }
+    .meta {
+      background: var(--gold-soft);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.9rem 1.1rem;
+      font-size: 0.9rem;
+      margin: 1rem 0 1.4rem;
+    }
+    a { color: var(--forest); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="index.html">
+        <img src="assets/img/app-icon.png" alt="Sudoku Grove">
+        <span>Sudoku Grove</span>
+      </a>
+      <a class="back-link" href="index.html">← Back to Sudoku Grove</a>
+    </div>
+  </header>
+
+  <main class="container">
+    <article>
+      <h1>Privacy Policy</h1>
+      <div class="meta">
+        <strong>Effective date:</strong> November 2026<br>
+        <strong>Developer:</strong> Sudoku Grove (update with your developer / company name before Play Store launch)<br>
+        <strong>Contact:</strong> <a href="mailto:support@example.com">support@example.com</a> (replace with your monitored support email)
+      </div>
+
+      <h2>1. Information Stored by the Game</h2>
+      <p>
+        Sudoku Grove stores puzzle progress, answers entered, pencil notes, completion times, personal bests,
+        Grove points, shop items, badges, theme choice, sound/vibration preferences, mistake-display choice,
+        language choice, tutorial preference, and public-score sharing choice locally on your device.
+        The app does not operate its own account server or collect personal profiles on a developer server.
+      </p>
+      <p>
+        Your local game progress file is included in Android’s standard device backup and device-to-device transfer
+        so your progress can move to a new phone. That backup is controlled by Android and your Google account
+        settings, can be turned off in your phone’s settings, and is never sent to the developer.
+      </p>
+
+      <h2>2. Optional Google Play Games Cloud Save &amp; Leaderboards</h2>
+      <p>
+        You can play the complete game and keep personal bests offline without signing in.
+        If you choose to connect Google Play Games, the app can sync your progress through Google Play Games
+        Saved Games. Public Grove points and Challenge level leaderboards are separate, optional, and gated behind
+        a neutral age screen and an explicit opt-in toggle. Players who select “Under 13 or unsure” cannot access
+        public leaderboards. Google processes Play Games data under Google’s own terms and privacy policy.
+      </p>
+
+      <h2>3. Optional Rewarded Ads &amp; Privacy Choices</h2>
+      <p>
+        Sudoku Grove uses Google Mobile Ads solely for optional rewarded ads — when a player chooses to watch an ad
+        for a hint in Story, Daily, or Puzzle Garden mode, or to respawn after a Challenge timer expires (at most
+        two respawns per run). No forced ads interrupt ordinary play.
+      </p>
+      <p>
+        Ad requests are configured with child age treatment and a G maximum content rating, and Google’s User
+        Messaging Platform (UMP) manages required privacy messages and consent status. Where required by law,
+        an ad privacy options button appears in Records → Settings.
+      </p>
+
+      <h2>4. Optional In-App Purchases</h2>
+      <p>
+        Sudoku Grove offers optional one-time purchases via Google Play Billing (“No ads”, “Premium pack”, and
+        “Open all chapters” upgrade) behind a grown-up check. All payments are handled by Google Play; the
+        developer never receives payment card details. Owned entitlements are cached locally for offline use and
+        re-verified with Google Play on launch.
+      </p>
+
+      <h2>5. Sharing</h2>
+      <p>
+        When you tap the Share button after completing a puzzle, the app opens Android’s standard share sheet with
+        a plain-text puzzle summary containing no personal information. Nothing is shared automatically.
+      </p>
+
+      <h2>6. Children and Families</h2>
+      <p>
+        Sudoku Grove is designed for players of all ages. Children can enjoy the entire game without signing into
+        any account. Ad requests use child age treatment and G content rating, public leaderboards are age-gated,
+        and in-app purchases include a grown-up check before opening Google Play’s purchase dialog.
+      </p>
+
+      <h2>7. Storage and Deletion</h2>
+      <p>
+        You can delete all local game data at any time by clearing Sudoku Grove’s app data or uninstalling the app.
+        Android device backups can be managed in your phone’s Google backup settings. To delete Google Play Games
+        data, follow <a href="https://support.google.com/googleplay/answer/9130646" target="_blank" rel="noopener">Google’s Play Games data deletion guide</a>.
+      </p>
+
+      <h2>8. Changes and Contact</h2>
+      <p>
+        If our data practices change, we will update this privacy policy before the relevant release.
+        For privacy questions, contact the support address listed at the top of this page.
+      </p>
+    </article>
+  </main>
+
+  <script>
+    const saved = localStorage.getItem('sg_theme');
+    if (saved === 'dark' || (!saved && matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.dataset.theme = 'dark';
+    }
+  </script>
+</body>
+</html>

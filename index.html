@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sudoku Grove — Cozy Owl Story Sudoku for Android</title>
+  <meta name="description" content="Cozy woodland Sudoku for all ages. Follow Hajime and Nina across 15 RPG story chapters, Daily streaks, Endless Challenge, and 4 Puzzle Garden variants in 13 languages.">
+  <meta property="og:title" content="Sudoku Grove — Cozy Owl Story Sudoku">
+  <meta property="og:description" content="15 RPG story chapters, technique-graded puzzles, teaching hints, 4 variants, original acoustic soundtrack, and 13 languages.">
+  <meta property="og:image" content="assets/img/story_gate_approach.webp">
+  <link rel="icon" type="image/png" href="assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f2f8ec;
+      --bg-warm: #fcf8ec;
+      --surface: #ffffff;
+      --surface-soft: #e7f3de;
+      --forest: #245843;
+      --forest-deep: #183c2e;
+      --forest-bright: #347a5c;
+      --ink: #1d2f27;
+      --muted: #5b6e64;
+      --gold: #e7b866;
+      --gold-soft: #fff5d9;
+      --berry: #8a69c9;
+      --berry-soft: #f1ecff;
+      --sky: #2b7a99;
+      --error: #c04444;
+      --border: rgba(36, 88, 67, 0.14);
+      --shadow: 0 18px 42px rgba(24, 60, 46, 0.10);
+      --cell-bg: #ffffff;
+      --cell-rel: #eef6e9;
+      --cell-sel: #cfe6d4;
+      --cell-same: #dfeed9;
+      --cell-hint: #ffe59c;
+    }
+
+    [data-theme="dark"] {
+      --bg: #13251d;
+      --bg-warm: #192e24;
+      --surface: #1e362b;
+      --surface-soft: #264436;
+      --forest: #8fd1a8;
+      --forest-deep: #11241c;
+      --forest-bright: #5ca97b;
+      --ink: #e8f4ec;
+      --muted: #9eb8aa;
+      --gold: #e8c37d;
+      --gold-soft: #3a3320;
+      --berry: #c2b0ff;
+      --berry-soft: #2d2846;
+      --sky: #7fc4dd;
+      --error: #ff7c7c;
+      --border: rgba(149, 207, 172, 0.16);
+      --shadow: 0 18px 42px rgba(0, 0, 0, 0.34);
+      --cell-bg: #1d3429;
+      --cell-rel: #254134;
+      --cell-sel: #3d644a;
+      --cell-same: #2f513c;
+      --cell-hint: #6b5828;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 8% 10%, rgba(159, 222, 168, 0.25), transparent 34%),
+        radial-gradient(circle at 92% 18%, rgba(231, 184, 102, 0.20), transparent 32%),
+        radial-gradient(circle at 86% 78%, rgba(138, 105, 201, 0.14), transparent 36%),
+        var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      overflow-x: hidden;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    h1, h2, h3, .serif {
+      font-family: 'Fraunces', Georgia, serif;
+      letter-spacing: -0.02em;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    .container {
+      width: min(1120px, calc(100% - 2rem));
+      margin: 0 auto;
+    }
+
+    /* Navigation */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(14px);
+      background: color-mix(in srgb, var(--bg) 82%, transparent);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.75rem 0;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+    .brand img {
+      width: 40px;
+      height: 40px;
+      border-radius: 11px;
+      box-shadow: 0 4px 12px rgba(24, 60, 46, 0.2);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .nav-links a:hover { color: var(--forest); }
+    .nav-actions { display: flex; align-items: center; gap: 0.6rem; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.78rem 1.35rem;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      border: none;
+      cursor: pointer;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, background 0.2s ease;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); }
+    .btn-primary {
+      background: linear-gradient(135deg, #2d7554, #4c9665);
+      color: #ffffff;
+      box-shadow: 0 10px 24px rgba(36, 88, 67, 0.28);
+    }
+    .btn-gold {
+      background: linear-gradient(135deg, #e7b866, #d99b3d);
+      color: #1f170a;
+      box-shadow: 0 10px 24px rgba(217, 155, 61, 0.28);
+    }
+    .btn-outline {
+      background: var(--surface);
+      color: var(--ink);
+      border: 1.5px solid var(--border);
+    }
+    .theme-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--ink);
+      cursor: pointer;
+      font-size: 1.05rem;
+      display: grid;
+      place-items: center;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 3.4rem 0 2.6rem;
+    }
+    .hero-card {
+      position: relative;
+      border-radius: 32px;
+      padding: clamp(1.8rem, 4vw, 3.4rem);
+      background: linear-gradient(135deg, #215741 0%, #377d5c 52%, #599c68 100%);
+      color: #ffffff;
+      box-shadow: 0 28px 64px rgba(24, 60, 46, 0.24);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 2rem;
+      align-items: center;
+    }
+    .hero-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 82% 30%, rgba(255, 232, 154, 0.36), transparent 44%),
+        radial-gradient(circle at 14% 92%, rgba(255, 255, 255, 0.12), transparent 40%);
+      pointer-events: none;
+    }
+    .hero-copy { position: relative; z-index: 2; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.38rem 0.9rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.18);
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      margin-bottom: 1rem;
+    }
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      line-height: 1.08;
+      margin-bottom: 1rem;
+    }
+    .hero p {
+      font-size: clamp(1rem, 1.5vw, 1.14rem);
+      color: rgba(255, 255, 255, 0.92);
+      max-width: 54ch;
+      margin-bottom: 1.65rem;
+    }
+    .hero-ctas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.85rem;
+      margin-bottom: 1.6rem;
+    }
+    .hero-stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.4rem;
+      font-size: 0.88rem;
+      color: rgba(255, 255, 255, 0.88);
+    }
+    .hero-stats strong { display: block; font-size: 1.12rem; color: #ffe79a; }
+
+    .hero-stage {
+      position: relative;
+      z-index: 2;
+      min-height: 300px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .sun-halo {
+      position: absolute;
+      width: 270px;
+      height: 270px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 234, 160, 0.55) 0%, rgba(255, 234, 160, 0.14) 55%, transparent 72%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -52%);
+      animation: pulseGlow 4.5s ease-in-out infinite;
+    }
+    .owl-hajime {
+      width: clamp(150px, 20vw, 225px);
+      position: relative;
+      z-index: 3;
+      filter: drop-shadow(0 16px 24px rgba(15, 42, 31, 0.34));
+      animation: floatA 4.4s ease-in-out infinite;
+    }
+    .owl-nina {
+      width: clamp(120px, 16vw, 178px);
+      position: relative;
+      z-index: 2;
+      margin-left: -26px;
+      margin-bottom: 6px;
+      filter: drop-shadow(0 16px 24px rgba(15, 42, 31, 0.30));
+      animation: floatB 4.9s ease-in-out infinite;
+    }
+    @keyframes floatA {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-10px) rotate(2deg); }
+    }
+    @keyframes floatB {
+      0%, 100% { transform: translateY(-4px) rotate(2deg); }
+      50% { transform: translateY(7px) rotate(-2deg); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { transform: translate(-50%, -52%) scale(0.96); }
+      50% { transform: translate(-50%, -52%) scale(1.06); }
+    }
+
+    /* Sections */
+    section { padding: 3.4rem 0; }
+    .section-kicker {
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--forest);
+      margin-bottom: 0.45rem;
+    }
+    .section-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.9rem;
+    }
+    .section-head h2 {
+      font-size: clamp(1.75rem, 3.2vw, 2.4rem);
+      line-height: 1.15;
+    }
+    .section-head p {
+      color: var(--muted);
+      max-width: 52ch;
+    }
+
+    /* Playable Mini 6x6 Demo */
+    .demo-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: clamp(1.25rem, 3vw, 2.2rem);
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: minmax(270px, 410px) 1fr;
+      gap: 2rem;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .board-6 {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      aspect-ratio: 1 / 1;
+      border: 2.5px solid var(--forest);
+      border-radius: 14px;
+      overflow: hidden;
+      background: var(--cell-bg);
+      user-select: none;
+    }
+    .cell {
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      display: grid;
+      place-items: center;
+      position: relative;
+      cursor: pointer;
+      font-size: clamp(1.2rem, 3.2vw, 1.7rem);
+      font-weight: 700;
+      color: var(--forest);
+      background: var(--cell-bg);
+      transition: background 0.12s ease;
+    }
+    .cell:nth-child(6n) { border-right: none; }
+    .cell:nth-child(n+31) { border-bottom: none; }
+    /* 2x3 box borders for Mini 6x6 */
+    .cell[data-col="2"] { border-right: 2.5px solid var(--forest); }
+    .cell[data-row="1"], .cell[data-row="3"] { border-bottom: 2.5px solid var(--forest); }
+    .cell.given { color: var(--ink); font-weight: 800; }
+    .cell.related { background: var(--cell-rel); }
+    .cell.same { background: var(--cell-same); }
+    .cell.hint-cell { background: var(--cell-hint); }
+    .cell.selected { background: var(--cell-sel); outline: 2px solid var(--forest); outline-offset: -2px; z-index: 2; }
+    .cell.wrong { color: var(--error); }
+    .cell-notes {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      width: 100%;
+      height: 100%;
+      padding: 2px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .cell-notes span { display: grid; place-items: center; }
+
+    .demo-controls { display: flex; flex-direction: column; gap: 1rem; }
+    .demo-topbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .chip-group { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+    .chip {
+      padding: 0.36rem 0.78rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      background: var(--surface-soft);
+      color: var(--ink);
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .chip.active {
+      background: var(--forest);
+      color: var(--bg);
+      border-color: transparent;
+    }
+    .hint-box {
+      display: flex;
+      gap: 0.85rem;
+      align-items: center;
+      padding: 0.85rem 1rem;
+      border-radius: 16px;
+      background: var(--gold-soft);
+      border: 1px solid color-mix(in srgb, var(--gold) 65%, transparent);
+      font-size: 0.9rem;
+    }
+    .hint-box img { width: 48px; height: 48px; object-fit: contain; flex-shrink: 0; }
+    .pad-6 {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 0.45rem;
+    }
+    .pad-btn {
+      padding: 0.78rem 0;
+      border-radius: 13px;
+      border: 1.5px solid var(--border);
+      background: var(--surface-soft);
+      color: var(--forest);
+      font-size: 1.25rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.12s ease, background 0.15s ease;
+    }
+    .pad-btn:hover { transform: translateY(-2px); background: var(--cell-sel); }
+    .pad-btn.done { opacity: 0.42; }
+    .tool-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.45rem;
+    }
+    .tool-btn {
+      padding: 0.62rem 0.4rem;
+      border-radius: 12px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--ink);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .tool-btn.active { background: var(--forest); color: var(--bg); border-color: transparent; }
+
+    /* Mode Cards */
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.15rem;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 1.45rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .card-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      font-size: 1.6rem;
+      background: var(--surface-soft);
+    }
+    .card h3 { font-size: 1.25rem; }
+    .card p { color: var(--muted); font-size: 0.93rem; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: auto; padding-top: 0.35rem; }
+    .tag {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      color: var(--forest);
+    }
+
+    /* Story Showcase */
+    .story-grid {
+      display: grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap: 1.35rem;
+      align-items: stretch;
+    }
+    .story-frame {
+      position: relative;
+      border-radius: 26px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      min-height: 290px;
+      background: #14271e;
+    }
+    .story-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .story-dialogue {
+      position: absolute;
+      left: 1rem;
+      right: 1rem;
+      bottom: 1rem;
+      background: rgba(18, 34, 27, 0.90);
+      backdrop-filter: blur(8px);
+      border: 1.5px solid rgba(231, 184, 102, 0.8);
+      border-radius: 16px;
+      padding: 0.9rem 1.05rem;
+      color: #ffffff;
+    }
+    .speaker-pill {
+      display: inline-block;
+      background: #e7b866;
+      color: #1c1408;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      padding: 0.16rem 0.6rem;
+      border-radius: 999px;
+      margin-bottom: 0.35rem;
+    }
+    .story-dialogue p { font-size: 0.94rem; color: rgba(255, 255, 255, 0.94); }
+    .character-stack { display: flex; flex-direction: column; gap: 1rem; }
+    .char-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 1.15rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex: 1;
+    }
+    .char-card img { width: 78px; height: 78px; object-fit: contain; flex-shrink: 0; }
+    .char-card h3 { font-size: 1.15rem; margin-bottom: 0.2rem; }
+    .char-card p { font-size: 0.88rem; color: var(--muted); }
+
+    /* Soundtrack Player */
+    .music-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.1rem;
+    }
+    .track-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 1.3rem;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+    .track-top { display: flex; align-items: center; gap: 0.9rem; }
+    .play-btn {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #2d7554, #599c68);
+      color: #ffffff;
+      font-size: 1.1rem;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: grid;
+      place-items: center;
+      box-shadow: 0 8px 18px rgba(36, 88, 67, 0.28);
+    }
+    .track-meta h3 { font-size: 1.08rem; }
+    .track-meta span { font-size: 0.82rem; color: var(--muted); }
+    .progress-bar {
+      height: 7px;
+      border-radius: 999px;
+      background: var(--surface-soft);
+      overflow: hidden;
+      cursor: pointer;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--forest), var(--gold));
+      transition: width 0.1s linear;
+    }
+
+    /* Languages & Family Privacy */
+    .lang-ribbon {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.55rem;
+      margin-top: 1rem;
+    }
+    .lang-pill {
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+
+    .cta-banner {
+      background: linear-gradient(135deg, var(--forest-deep), #2a634b);
+      color: #ffffff;
+      border-radius: 28px;
+      padding: clamp(1.8rem, 4vw, 3rem);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      box-shadow: 0 22px 50px rgba(24, 60, 46, 0.25);
+    }
+    .cta-banner p { color: rgba(255, 255, 255, 0.88); max-width: 54ch; margin-top: 0.4rem; }
+
+    footer {
+      padding: 2.2rem 0 3rem;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .footer-links { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+    .footer-links a:hover { color: var(--forest); text-decoration: underline; }
+
+    /* Confetti canvas inside demo */
+    #leafCanvas {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    @media (max-width: 860px) {
+      .hero-card, .demo-wrap, .story-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .hero-stage { min-height: 220px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#top">
+        <img src="assets/img/app-icon.png" alt="Sudoku Grove icon">
+        <span class="serif">Sudoku Grove</span>
+      </a>
+      <nav class="nav-links" aria-label="Primary">
+        <a href="#demo">Play Demo</a>
+        <a href="#modes">Modes</a>
+        <a href="#story">Story</a>
+        <a href="#music">Soundtrack</a>
+        <a href="privacy.html">Privacy Policy</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="theme-btn" id="themeToggle" type="button" aria-label="Toggle dark mode" title="Toggle light / dark theme">🌙</button>
+        <a class="btn btn-primary" href="#download">Get the App</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container">
+        <div class="hero-card">
+          <div class="hero-copy">
+            <div class="pill">🦉 Cozy Woodland Puzzle Game · Android</div>
+            <h1>Grow your Sudoku skills in a sunlit owl forest.</h1>
+            <p>
+              Join Hajime and Nina across 15 hand-crafted RPG story chapters, build your Daily streak,
+              explore Diagonal, Killer &amp; Mini 6×6 puzzles, and learn real logic with gentle teaching hints.
+            </p>
+            <div class="hero-ctas">
+              <a class="btn btn-gold" href="#demo">🧩 Try Mini 6×6 Now</a>
+              <a class="btn btn-outline" style="background:rgba(255,255,255,0.14);color:#fff;border-color:rgba(255,255,255,0.34)" href="#music">🎵 Listen to Soundtrack</a>
+            </div>
+            <div class="hero-stats">
+              <div><strong>15 Chapters</strong>RPG Owl Story</div>
+              <div><strong>4 Variants</strong>Classic · Diagonal · Killer · 6×6</div>
+              <div><strong>13 Languages</strong>Built-in Translations</div>
+              <div><strong>All Ages</strong>Family-Safe &amp; Offline Ready</div>
+            </div>
+          </div>
+          <div class="hero-stage" aria-hidden="true">
+            <div class="sun-halo"></div>
+            <img class="owl-hajime" src="assets/img/owl_mascot_idle.webp" alt="Hajime the brown owl">
+            <img class="owl-nina" src="assets/img/nina_welcoming.webp" alt="Nina the silver owl">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Mini 6x6 Demo -->
+    <section id="demo">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">Interactive Preview</div>
+            <h2>Try a Mini 6×6 puzzle right here</h2>
+          </div>
+          <p>Fill every row, column, and 2×3 box with digits 1–6. Tap <strong>Hint</strong> to see how Hajime teaches the next logical step!</p>
+        </div>
+
+        <div class="demo-wrap">
+          <canvas id="leafCanvas"></canvas>
+          <div>
+            <div class="board-6" id="board" role="grid" aria-label="Mini 6 by 6 Sudoku board"></div>
+          </div>
+          <div class="demo-controls">
+            <div class="demo-topbar">
+              <div class="chip-group" id="puzzleTabs">
+                <button class="chip active" data-puzzle="0" type="button">Sprout #1</button>
+                <button class="chip" data-puzzle="1" type="button">Meadow #2</button>
+                <button class="chip" data-puzzle="2" type="button">Canopy #3</button>
+              </div>
+              <div class="chip-group">
+                <span class="chip" id="timerChip">⏱ 00:00</span>
+                <span class="chip" id="missChip">Misses: 0</span>
+              </div>
+            </div>
+
+            <div class="hint-box" id="hintBox">
+              <img src="assets/img/owl_mascot_happy.webp" alt="Hajime owl guide">
+              <div>
+                <strong id="hintTitle">Hajime’s Grove Tip</strong>
+                <div id="hintText">Select any empty square and pick 1–6 (or use your keyboard). Need a nudge? Tap Teaching Hint!</div>
+              </div>
+            </div>
+
+            <div class="pad-6" id="numPad"></div>
+
+            <div class="tool-row">
+              <button class="tool-btn" id="undoBtn" type="button">↩ Undo</button>
+              <button class="tool-btn" id="eraseBtn" type="button">⌫ Erase</button>
+              <button class="tool-btn" id="notesBtn" type="button">✎ Notes</button>
+              <button class="tool-btn" id="hintBtn" type="button">🪶 Hint</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Game Modes -->
+    <section id="modes">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">Four Ways to Play</div>
+            <h2>Relaxed stories or thrilling timed runs</h2>
+          </div>
+          <p>Every puzzle has exactly one unique solution and is graded by the real human solving techniques required — from Singles to X-Wing &amp; XY-Wing.</p>
+        </div>
+
+        <div class="grid-4">
+          <article class="card">
+            <div class="card-icon">📖</div>
+            <h3>Story Mode</h3>
+            <p>15 fixed chapters told through full-screen RPG cut-scenes with Hajime and Nina. Difficulty grows smoothly from Easy to Expert with no timer pressure.</p>
+            <div class="tag-row"><span class="tag">15 Chapters</span><span class="tag">No Timer</span></div>
+          </article>
+
+          <article class="card">
+            <div class="card-icon">⭐</div>
+            <h3>Endless Challenge</h3>
+            <p>Climb through unlimited randomized levels across 6 tiers — Very Easy to Legend — with fair time limits, rotating woodland scenes, and personal best tracking.</p>
+            <div class="tag-row"><span class="tag">6 Tiers</span><span class="tag">Unlimited Levels</span></div>
+          </article>
+
+          <article class="card">
+            <div class="card-icon">🗓️</div>
+            <h3>Daily Calendar &amp; Streaks</h3>
+            <p>One date-seeded puzzle every day with a calendar history, daily streak counter, and Streak Shields from the Grove Shop to protect missed days.</p>
+            <div class="tag-row"><span class="tag">Streaks</span><span class="tag">Plain-Text Share</span></div>
+          </article>
+
+          <article class="card">
+            <div class="card-icon">🧩</div>
+            <h3>Puzzle Garden</h3>
+            <p>Free-play sandbox featuring Classic 9×9, Diagonal (X-Sudoku), Killer Sudoku with sum cages &amp; smart auto-notes, and quick Mini 6×6 grids.</p>
+            <div class="tag-row"><span class="tag">Killer Cages</span><span class="tag">Diagonal</span><span class="tag">6×6</span></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Story Mode Showcase -->
+    <section id="story">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">Meet Your Woodland Guides</div>
+            <h2>An owl story woven into every chapter</h2>
+          </div>
+          <p>Unlock new forest paths, earn 20 achievement badges, and spend Grove points in the shop on board themes, number styles, and outfits for Hajime.</p>
+        </div>
+
+        <div class="story-grid">
+          <div class="story-frame">
+            <img src="assets/img/story_gate_approach.webp" alt="Hajime and Nina walking up to the sunlit forest puzzle gate">
+            <div class="story-dialogue">
+              <span class="speaker-pill">HAJIME</span>
+              <p>“Look at that carved leaf gate, Nina! Every row and box holds a clue — let’s solve it together, one quiet number at a time.”</p>
+            </div>
+          </div>
+
+          <div class="character-stack">
+            <div class="char-card">
+              <img src="assets/img/owl_mascot_happy.webp" alt="Hajime">
+              <div>
+                <h3>Hajime</h3>
+                <p>Warm-hearted brown owl and your logic coach. Explains teaching hints in plain words and wears shop hats &amp; crowns.</p>
+              </div>
+            </div>
+            <div class="char-card">
+              <img src="assets/img/nina_happy.webp" alt="Nina">
+              <div>
+                <h3>Nina</h3>
+                <p>Curious silver owl with a blossom feather. Cheers on every milestone and guides you through deeper forest mysteries.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Original Soundtrack -->
+    <section id="music">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <div class="section-kicker">Original Acoustic Soundtrack</div>
+            <h2>Warm music crafted for focus &amp; flow</h2>
+          </div>
+          <p>Tap play to hear the freshly composed seamless woodland loops built right into Sudoku Grove — with independent music, SFX, and haptic toggles.</p>
+        </div>
+
+        <div class="music-grid">
+          <div class="track-card" data-src="assets/audio/menu_piano.ogg">
+            <div class="track-top">
+              <button class="play-btn" type="button" aria-label="Play Morning in the Owl Grove">▶</button>
+              <div class="track-meta">
+                <h3>Morning in the Owl Grove</h3>
+                <span>Menu Theme · Felt Piano, Harp &amp; Flute</span>
+              </div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+          </div>
+
+          <div class="track-card" data-src="assets/audio/chill_grove.ogg">
+            <div class="track-top">
+              <button class="play-btn" type="button" aria-label="Play Sunlit Canopy">▶</button>
+              <div class="track-meta">
+                <h3>Sunlit Canopy</h3>
+                <span>Story &amp; Daily · Nylon Guitar, Kalimba &amp; Flute</span>
+              </div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+          </div>
+
+          <div class="track-card" data-src="assets/audio/challenge_trail.ogg">
+            <div class="track-top">
+              <button class="play-btn" type="button" aria-label="Play Owl's Trail Sprint">▶</button>
+              <div class="track-meta">
+                <h3>Owl’s Trail Sprint</h3>
+                <span>Challenge Mode · Marimba, Cajón &amp; Flute</span>
+              </div>
+            </div>
+            <div class="progress-bar"><div class="progress-fill"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Languages & Family-Safe Promise -->
+    <section>
+      <div class="container">
+        <div class="grid-4">
+          <div class="card" style="grid-column: span 2;">
+            <div class="section-kicker">Play in Your Language</div>
+            <h3>13 languages built right in</h3>
+            <p>Follows your phone automatically or switch anytime in Records → Settings → Language.</p>
+            <div class="lang-ribbon">
+              <span class="lang-pill">English</span>
+              <span class="lang-pill">Bahasa Melayu</span>
+              <span class="lang-pill">Bahasa Indonesia</span>
+              <span class="lang-pill">简体中文</span>
+              <span class="lang-pill">繁體中文</span>
+              <span class="lang-pill">Español</span>
+              <span class="lang-pill">Português</span>
+              <span class="lang-pill">Français</span>
+              <span class="lang-pill">Deutsch</span>
+              <span class="lang-pill">日本語</span>
+              <span class="lang-pill">한국어</span>
+              <span class="lang-pill">हिन्दी</span>
+              <span class="lang-pill">Tiếng Việt</span>
+            </div>
+          </div>
+
+          <div class="card" style="grid-column: span 2;">
+            <div class="section-kicker">Respectful &amp; All-Ages</div>
+            <h3>Designed for kids, parents &amp; puzzle fans</h3>
+            <p>
+              No forced interstitial ads during gameplay — rewarded ads appear only when you ask for a hint or Challenge respawn,
+              and a single optional <strong>No Ads</strong> purchase removes them permanently behind a grown-up check.
+              Works 100% offline with Android backup and optional age-gated Google Play Games sync.
+            </p>
+            <div class="tag-row">
+              <span class="tag">G-Rated Ads</span>
+              <span class="tag">Offline Play</span>
+              <span class="tag">No Account Required</span>
+              <span class="tag">Phone &amp; Tablet UI</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Download CTA -->
+    <section id="download">
+      <div class="container">
+        <div class="cta-banner">
+          <div>
+            <h2 class="serif" style="font-size:clamp(1.6rem,3vw,2.2rem)">Ready to enter Sudoku Grove?</h2>
+            <p>Coming soon to Google Play for Android phones, tablets, and foldables (Android 7.0+ through Android 16).</p>
+          </div>
+          <div style="display:flex;gap:0.75rem;flex-wrap:wrap">
+            <!-- Replace the href below with your live Google Play Store URL once published -->
+            <a class="btn btn-gold" href="https://play.google.com/store" target="_blank" rel="noopener">▶ Google Play (Coming Soon)</a>
+            <a class="btn btn-outline" style="background:rgba(255,255,255,0.14);color:#fff;border-color:rgba(255,255,255,0.34)" href="privacy.html">🔒 Privacy Policy</a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div style="display:flex;align-items:center;gap:0.6rem">
+        <img src="assets/img/favicon.png" alt="" width="24" height="24" style="border-radius:6px">
+        <span>© 2026 Sudoku Grove · Built with care for puzzle lovers of all ages.</span>
+      </div>
+      <div class="footer-links">
+        <a href="#demo">Play Demo</a>
+        <a href="#music">Soundtrack</a>
+        <a href="privacy.html">Privacy Policy</a>
+        <a href="app-ads.txt">app-ads.txt</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // ---------- Theme Toggle ----------
+    const root = document.documentElement;
+    const themeBtn = document.getElementById('themeToggle');
+    const savedTheme = localStorage.getItem('sg_theme');
+    if (savedTheme === 'dark' || (!savedTheme && matchMedia('(prefers-color-scheme: dark)').matches)) {
+      root.dataset.theme = 'dark';
+      themeBtn.textContent = '☀️';
+    }
+    themeBtn.addEventListener('click', () => {
+      const dark = root.dataset.theme === 'dark';
+      root.dataset.theme = dark ? 'light' : 'dark';
+      themeBtn.textContent = dark ? '🌙' : '☀️';
+      localStorage.setItem('sg_theme', root.dataset.theme);
+    });
+
+    // ---------- Soundtrack Player ----------
+    const audio = new Audio();
+    audio.loop = true;
+    let activeCard = null;
+    const trackCards = [...document.querySelectorAll('.track-card')];
+
+    trackCards.forEach(card => {
+      const btn = card.querySelector('.play-btn');
+      const bar = card.querySelector('.progress-bar');
+      btn.addEventListener('click', () => {
+        if (activeCard === card && !audio.paused) {
+          audio.pause();
+          btn.textContent = '▶';
+          return;
+        }
+        trackCards.forEach(c => {
+          c.querySelector('.play-btn').textContent = '▶';
+          c.querySelector('.progress-fill').style.width = '0%';
+        });
+        if (activeCard !== card) {
+          audio.src = card.dataset.src;
+          activeCard = card;
+        }
+        audio.play().then(() => { btn.textContent = '❚❚'; }).catch(() => {});
+      });
+      bar.addEventListener('click', e => {
+        if (activeCard !== card || !audio.duration) return;
+        const rect = bar.getBoundingClientRect();
+        audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+      });
+    });
+
+    audio.addEventListener('timeupdate', () => {
+      if (!activeCard || !audio.duration) return;
+      activeCard.querySelector('.progress-fill').style.width = (audio.currentTime / audio.duration * 100) + '%';
+    });
+
+    // ---------- Playable Mini 6x6 Sudoku Demo (Unique-Solution Puzzles) ----------
+    const PUZZLES = [
+      {
+        solution: [
+          1,2,3, 4,5,6,
+          4,5,6, 1,2,3,
+          2,3,1, 5,6,4,
+          5,6,4, 2,3,1,
+          3,1,2, 6,4,5,
+          6,4,5, 3,1,2
+        ],
+        puzzle: [
+          1,0,3, 0,5,0,
+          0,5,0, 1,0,3,
+          0,3,1, 5,0,0,
+          5,0,4, 0,3,1,
+          3,1,0, 6,0,5,
+          0,4,0, 3,1,0
+        ]
+      },
+      {
+        solution: [
+          6,1,4, 2,3,5,
+          2,3,5, 6,1,4,
+          1,4,6, 5,2,3,
+          3,5,2, 4,6,1,
+          4,2,1, 3,5,6,
+          5,6,3, 1,4,2
+        ],
+        puzzle: [
+          6,0,4, 0,3,0,
+          0,3,0, 6,0,4,
+          1,0,6, 5,0,3,
+          0,5,2, 0,6,0,
+          4,0,0, 3,5,0,
+          0,6,3, 0,0,2
+        ]
+      },
+      {
+        solution: [
+          3,6,2, 5,1,4,
+          5,1,4, 3,6,2,
+          6,2,3, 4,5,1,
+          4,5,1, 6,2,3,
+          1,3,5, 2,4,6,
+          2,4,6, 1,3,5
+        ],
+        puzzle: [
+          0,6,2, 0,1,0,
+          5,0,0, 3,0,2,
+          6,0,3, 4,0,0,
+          0,5,0, 6,2,0,
+          1,0,5, 0,4,6,
+          0,4,0, 1,0,5
+        ]
+      }
+    ];
+
+    let currentIdx = 0;
+    let board = [];
+    let givens = new Set();
+    let notes = {};
+    let history = [];
+    let selected = 1;
+    let noteMode = false;
+    let misses = 0;
+    let hintCell = -1;
+    let seconds = 0;
+    let solved = false;
+
+    const boardEl = document.getElementById('board');
+    const padEl = document.getElementById('numPad');
+    const hintTitle = document.getElementById('hintTitle');
+    const hintText = document.getElementById('hintText');
+    const timerChip = document.getElementById('timerChip');
+    const missChip = document.getElementById('missChip');
+    const notesBtn = document.getElementById('notesBtn');
+
+    function boxOf(idx) {
+      const r = Math.floor(idx / 6), c = idx % 6;
+      return Math.floor(r / 2) * 2 + Math.floor(c / 3);
+    }
+
+    function peersOf(idx) {
+      const r = Math.floor(idx / 6), c = idx % 6, b = boxOf(idx);
+      const set = new Set();
+      for (let i = 0; i < 36; i++) {
+        if (i !== idx && (Math.floor(i / 6) === r || i % 6 === c || boxOf(i) === b)) set.add(i);
+      }
+      return set;
+    }
+
+    function loadPuzzle(idx) {
+      currentIdx = idx;
+      const p = PUZZLES[idx];
+      board = [...p.puzzle];
+      givens = new Set(board.map((v, i) => v ? i : -1).filter(i => i >= 0));
+      notes = {};
+      history = [];
+      misses = 0;
+      hintCell = -1;
+      seconds = 0;
+      solved = false;
+      selected = board.findIndex(v => v === 0);
+      hintTitle.textContent = 'Hajime’s Grove Tip';
+      hintText.textContent = 'Select any empty square and pick 1–6 (or type on your keyboard). Tap Hint for a step-by-step clue!';
+      document.querySelectorAll('#puzzleTabs .chip').forEach((b, i) => b.classList.toggle('active', i === idx));
+      render();
+    }
+
+    function setHint(title, msg, cell = -1) {
+      hintTitle.textContent = title;
+      hintText.textContent = msg;
+      hintCell = cell;
+    }
+
+    function enterDigit(d) {
+      if (solved || selected < 0 || givens.has(selected)) return;
+      hintCell = -1;
+      if (noteMode) {
+        if (board[selected] !== 0) return;
+        history.push({ board: [...board], notes: JSON.parse(JSON.stringify(notes)) });
+        const cur = new Set(notes[selected] || []);
+        if (cur.has(d)) cur.delete(d); else cur.add(d);
+        notes[selected] = [...cur];
+        render();
+        return;
+      }
+      if (board[selected] === d) return;
+      history.push({ board: [...board], notes: JSON.parse(JSON.stringify(notes)) });
+      board[selected] = d;
+      delete notes[selected];
+      const sol = PUZZLES[currentIdx].solution;
+      if (d === sol[selected]) {
+        peersOf(selected).forEach(p => {
+          if (notes[p]) notes[p] = notes[p].filter(x => x !== d);
+        });
+        checkSolved();
+      } else {
+        misses++;
+        setHint('Gentle check', `${d} doesn’t belong in Row ${Math.floor(selected/6)+1}, Column ${(selected%6)+1}. Try another number or tap Undo!`);
+      }
+      render();
+    }
+
+    function checkSolved() {
+      const sol = PUZZLES[currentIdx].solution;
+      if (board.every((v, i) => v === sol[i])) {
+        solved = true;
+        setHint('🌿 Puzzle Complete!', `Wonderful job! You cleared Mini 6×6 in ${formatTime(seconds)} with ${misses} mistake${misses === 1 ? '' : 's'}. Try the next puzzle!`);
+        launchLeaves();
+      }
+    }
+
+    function giveTeachingHint() {
+      if (solved) return;
+      const sol = PUZZLES[currentIdx].solution;
+      const wrongIdx = board.findIndex((v, i) => v !== 0 && v !== sol[i]);
+      if (wrongIdx >= 0) {
+        history.push({ board: [...board], notes: JSON.parse(JSON.stringify(notes)) });
+        board[wrongIdx] = 0;
+        selected = wrongIdx;
+        setHint('Spot a mistake first', `Row ${Math.floor(wrongIdx/6)+1}, Column ${(wrongIdx%6)+1} had a wrong number — I cleared it so we have a clean board.`, wrongIdx);
+        render();
+        return;
+      }
+      // Look for a naked single or full house to teach!
+      for (let i = 0; i < 36; i++) {
+        if (board[i] !== 0) continue;
+        const used = new Set([...peersOf(i)].map(p => board[p]).filter(Boolean));
+        const cands = [1,2,3,4,5,6].filter(d => !used.has(d));
+        if (cands.length === 1) {
+          const d = cands[0];
+          history.push({ board: [...board], notes: JSON.parse(JSON.stringify(notes)) });
+          board[i] = d;
+          delete notes[i];
+          selected = i;
+          setHint('Teaching Hint · Naked Single', `Look at Row ${Math.floor(i/6)+1}, Col ${(i%6)+1}: all other digits already appear in its row, column, or box, so ${d} is the only fit!`, i);
+          checkSolved();
+          render();
+          return;
+        }
+      }
+      const emptyIdx = board[selected] === 0 ? selected : board.findIndex(v => v === 0);
+      if (emptyIdx >= 0) {
+        const d = sol[emptyIdx];
+        history.push({ board: [...board], notes: JSON.parse(JSON.stringify(notes)) });
+        board[emptyIdx] = d;
+        delete notes[emptyIdx];
+        selected = emptyIdx;
+        setHint('Teaching Hint · Box Clue', `In Box ${boxOf(emptyIdx)+1}, ${d} belongs right here at Row ${Math.floor(emptyIdx/6)+1}, Col ${(emptyIdx%6)+1}.`, emptyIdx);
+        checkSolved();
+        render();
+      }
+    }
+
+    function formatTime(s) {
+      return `${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+    }
+
+    function render() {
+      const sol = PUZZLES[currentIdx].solution;
+      const selVal = selected >= 0 ? board[selected] : 0;
+      const rel = selected >= 0 ? peersOf(selected) : new Set();
+      boardEl.innerHTML = '';
+      for (let i = 0; i < 36; i++) {
+        const r = Math.floor(i / 6), c = i % 6;
+        const div = document.createElement('button');
+        div.type = 'button';
+        div.className = 'cell';
+        div.dataset.row = r;
+        div.dataset.col = c;
+        if (givens.has(i)) div.classList.add('given');
+        if (rel.has(i)) div.classList.add('related');
+        if (selVal && board[i] === selVal) div.classList.add('same');
+        if (i === hintCell) div.classList.add('hint-cell');
+        if (i === selected) div.classList.add('selected');
+        if (board[i] && board[i] !== sol[i]) div.classList.add('wrong');
+        div.setAttribute('aria-label', `Row ${r+1} Column ${c+1}, ${board[i] || 'empty'}`);
+        if (board[i]) {
+          div.textContent = board[i];
+        } else if (notes[i] && notes[i].length) {
+          const ng = document.createElement('div');
+          ng.className = 'cell-notes';
+          for (let d = 1; d <= 6; d++) {
+            const sp = document.createElement('span');
+            sp.textContent = notes[i].includes(d) ? d : '';
+            ng.appendChild(sp);
+          }
+          div.appendChild(ng);
+        }
+        div.addEventListener('click', () => { selected = i; render(); });
+        boardEl.appendChild(div);
+      }
+      padEl.innerHTML = '';
+      for (let d = 1; d <= 6; d++) {
+        const left = 6 - board.filter(v => v === d).length;
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'pad-btn' + (left <= 0 ? ' done' : '');
+        b.innerHTML = `${d}<div style="font-size:0.62rem;opacity:0.65;margin-top:-2px">${left <= 0 ? '✓' : left}</div>`;
+        b.addEventListener('click', () => enterDigit(d));
+        padEl.appendChild(b);
+      }
+      missChip.textContent = `Misses: ${misses}`;
+      notesBtn.classList.toggle('active', noteMode);
+      notesBtn.textContent = noteMode ? '✎ Notes ON' : '✎ Notes';
+    }
+
+    document.querySelectorAll('#puzzleTabs .chip').forEach(btn => {
+      btn.addEventListener('click', () => loadPuzzle(Number(btn.dataset.puzzle)));
+    });
+    document.getElementById('undoBtn').addEventListener('click', () => {
+      if (solved || !history.length) return;
+      const prev = history.pop();
+      board = prev.board;
+      notes = prev.notes;
+      render();
+    });
+    document.getElementById('eraseBtn').addEventListener('click', () => {
+      if (solved || selected < 0 || givens.has(selected)) return;
+      history.push({ board: [...board], notes: JSON.parse(JSON.stringify(notes)) });
+      board[selected] = 0;
+      delete notes[selected];
+      render();
+    });
+    notesBtn.addEventListener('click', () => { noteMode = !noteMode; render(); });
+    document.getElementById('hintBtn').addEventListener('click', giveTeachingHint);
+
+    window.addEventListener('keydown', e => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      if (e.key >= '1' && e.key <= '6') enterDigit(Number(e.key));
+      else if (e.key === 'Backspace' || e.key === 'Delete') document.getElementById('eraseBtn').click();
+      else if (e.key === 'ArrowRight') { selected = (selected + 1) % 36; render(); }
+      else if (e.key === 'ArrowLeft') { selected = (selected + 35) % 36; render(); }
+      else if (e.key === 'ArrowDown') { selected = (selected + 6) % 36; render(); }
+      else if (e.key === 'ArrowUp') { selected = (selected + 30) % 36; render(); }
+    });
+
+    setInterval(() => {
+      if (!solved) {
+        seconds++;
+        timerChip.textContent = `⏱ ${formatTime(seconds)}`;
+      }
+    }, 1000);
+
+    // Falling leaf celebration
+    function launchLeaves() {
+      const canvas = document.getElementById('leafCanvas');
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      const ctx = canvas.getContext('2d');
+      const colors = ['#6DBE6F', '#E7B866', '#FF9B9B', '#82CBEA', '#B79CF0'];
+      const leaves = Array.from({ length: 55 }, () => ({
+        x: Math.random() * canvas.width,
+        y: -20 - Math.random() * 140,
+        vy: 1.5 + Math.random() * 2.4,
+        vx: (Math.random() - 0.5) * 1.4,
+        rot: Math.random() * Math.PI * 2,
+        vrot: (Math.random() - 0.5) * 0.12,
+        r: 5 + Math.random() * 6,
+        c: colors[Math.floor(Math.random() * colors.length)]
+      }));
+      let frames = 0;
+      function tick() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        leaves.forEach(l => {
+          l.x += l.vx + Math.sin(frames * 0.06 + l.r) * 0.6;
+          l.y += l.vy;
+          l.rot += l.vrot;
+          ctx.save();
+          ctx.translate(l.x, l.y);
+          ctx.rotate(l.rot);
+          ctx.fillStyle = l.c;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, l.r, l.r * 0.48, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        });
+        if (++frames < 170) requestAnimationFrame(tick);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      tick();
+    }
+
+    loadPuzzle(0);
+  </script>
+</body>
+</html>
